@@ -207,6 +207,16 @@ def comenzar():
     ir('game')
 
 
+def conservar_tipo_sesion():
+    """El estado del widget es temporal; guardamos el tipo en una clave persistente."""
+    st.session_state.session_type = st.session_state.session_type_control
+
+
+def conservar_codigo_jugador():
+    """Evita perder el código al abandonar el menú principal."""
+    st.session_state.player_code = st.session_state.player_code_control
+
+
 def responder(elegido):
     if not st.session_state.active or st.session_state.choice is not None:
         return
@@ -280,9 +290,15 @@ with st.container(border=True):
         st.write('Selecciona el propósito de la sesión. Utiliza un código como P01, sin nombre ni correo.')
         c1, c2 = st.columns(2)
         with c1:
-            st.selectbox('Sesión', TIPOS, key='session_type')
+            if 'session_type_control' not in st.session_state:
+                st.session_state.session_type_control = st.session_state.session_type
+            st.selectbox('Sesión', TIPOS, key='session_type_control',
+                         on_change=conservar_tipo_sesion)
         with c2:
-            st.text_input('Código de jugador', key='player_code', max_chars=20)
+            if 'player_code_control' not in st.session_state:
+                st.session_state.player_code_control = st.session_state.player_code
+            st.text_input('Código de jugador', key='player_code_control',
+                          max_chars=20, on_change=conservar_codigo_jugador)
         a,b,c = st.columns(3)
         with a:
             if st.button('🐠 Jugar', type='primary', use_container_width=True):ir('elegir')
